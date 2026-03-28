@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>THS — Field Hub</title>
+  <style>
+    :root {
+      --teal:#0a7c6e; --teal-dark:#065f55; --teal-mid:#0e9e8d; --teal-light:#e6f7f5;
+      --gold:#c8960c; --gold-light:#fef9e7;
+      --s50:#f8fafc; --s100:#f1f5f9; --s200:#e2e8f0; --s300:#cbd5e1;
+      --s400:#94a3b8; --s500:#64748b; --s700:#334155; --s800:#1e293b;
+      --red:#dc2626; --redl:#fef2f2; --green:#16a34a; --border:#e2e8f0;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+    body{font-family:ui-sans-serif,system-ui,-apple-system,sans-serif;background:var(--s100);overscroll-behavior-y:contain}
+    .app{max-width:500px;margin:0 auto;min-height:100vh;background:white;box-shadow:0 0 60px rgba(10,124,110,0.1)}
+
+    /* HEADER */
+    .hdr{background:var(--teal-dark);padding:14px 16px 0;border-bottom:4px solid var(--gold);position:sticky;top:0;z-index:200}
+    .hdr-top{display:flex;align-items:center;justify-content:space-between;padding-bottom:12px}
+    .hdr-logo{height:36px;object-fit:contain}
+    .hdr-name{font-size:0.62rem;font-weight:800;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.08em;margin-top:2px;text-align:right}
+    .add-btn{background:var(--gold);color:#1a0e00;border:none;border-radius:8px;padding:8px 14px;font-size:0.68rem;font-weight:900;text-transform:uppercase;letter-spacing:0.05em;cursor:pointer}
+    .vtabs{display:flex;border-top:1px solid rgba(255,255,255,0.1)}
+    .vtab{flex:1;padding:10px 4px;font-size:0.65rem;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:rgba(255,255,255,0.4);border:none;background:transparent;cursor:pointer;border-bottom:3px solid transparent;transition:all 0.15s}
+    .vtab.on{color:var(--gold);border-bottom-color:var(--gold)}
+
+    /* MAIN */
+    .main{padding:14px 12px 100px}
+
+    /* SEARCH */
+    .search-wrap{position:relative;margin-bottom:14px}
+    .search-inp{width:100%;background:white;border:1.5px solid var(--border);border-radius:10px;padding:10px 14px 10px 36px;font-size:0.85rem;font-family:inherit;outline:none;color:var(--s800)}
+    .search-inp:focus{border-color:var(--teal)}
+    .search-ico{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--s400);font-size:0.9rem;pointer-events:none}
+
+    /* STATS */
+    .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+    .stat{background:white;border:1.5px solid var(--border);border-radius:12px;padding:12px 8px;text-align:center}
+    .stat-n{font-size:1.6rem;font-weight:900;color:var(--teal-dark);line-height:1}
+    .stat-l{font-size:0.55rem;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:var(--s500);margin-top:4px}
+
+    /* CUSTOMER CARDS */
+    .cc{background:white;border-radius:14px;border:1.5px solid var(--border);overflow:hidden;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,0.04)}
+    .cc-head{display:flex;align-items:stretch}
+    .cc-accent{width:6px;flex-shrink:0}
+    .cc-accent.win{background:var(--teal)}
+    .cc-accent.door{background:var(--gold)}
+    .cc-accent.both{background:linear-gradient(180deg,var(--teal) 0%,var(--gold) 100%)}
+    .cc-body{flex:1;padding:12px 12px 12px 10px}
+    .cc-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:4px}
+    .cc-name{font-size:1rem;font-weight:900;color:var(--s800);text-transform:uppercase;line-height:1.2;flex:1}
+    .stage-pill{font-size:0.52rem;font-weight:800;text-transform:uppercase;padding:3px 8px;border-radius:20px;white-space:nowrap;margin-left:8px;flex-shrink:0}
+    .pill-new{background:#eff6ff;color:#1e40af;border:1px solid #bfdbfe}
+    .pill-appt{background:#fef3c7;color:#92400e;border:1px solid #fcd34d}
+    .pill-quoted{background:#ecfdf5;color:#065f46;border:1px solid #6ee7b7}
+    .pill-signed{background:#f0fdf4;color:#166534;border:1px solid #86efac}
+    .pill-fm{background:#fff7ed;color:#9a3412;border:1px solid #fdba74}
+    .pill-install{background:#e0f2fe;color:#0c4a6e;border:1px solid #7dd3fc}
+    .pill-done{background:var(--s100);color:var(--s500);border:1px solid var(--border)}
+    .cc-meta{font-size:0.65rem;color:var(--s500);font-weight:600;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .cc-acts{display:flex;border-top:1px solid var(--border)}
+    .ca{flex:1;padding:13px 4px;border:none;background:transparent;font-size:0.68rem;font-weight:900;text-transform:uppercase;color:var(--s500);cursor:pointer;text-align:center;transition:background 0.15s}
+    .ca:active{background:var(--s100)}
+    .ca:not(:last-child){border-right:1px solid var(--border)}
+    .ca.p{color:var(--teal-dark)}
+    .ca.gold{color:var(--gold)}
+
+    /* EXPANDED */
+    .cc-det{padding:12px;border-top:1px solid var(--border);background:var(--s50);display:flex;flex-direction:column;gap:10px}
+    .det-row{display:flex;gap:8px;flex-wrap:wrap}
+    .det-field{flex:1;min-width:130px}
+    .det-label{font-size:0.55rem;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:var(--s400);display:block;margin-bottom:3px}
+    .det-val{font-size:0.8rem;font-weight:700;color:var(--s800)}
+    .det-val a{color:var(--teal);text-decoration:none}
+    .stage-sel{width:100%;background:white;border:1.5px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--s800);font-size:0.8rem;font-family:inherit;outline:none;-webkit-appearance:none}
+    .stage-sel:focus{border-color:var(--teal)}
+
+    /* EMPTY */
+    .empty{text-align:center;padding:50px 20px;color:var(--s400);font-weight:700;font-size:0.85rem}
+    .empty-ico{font-size:2.5rem;display:block;margin-bottom:10px}
+
+    /* MODAL */
+    .overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:400;display:flex;align-items:flex-end;justify-content:center}
+    .overlay.hidden{display:none}
+    .modal{background:white;border-radius:20px 20px 0 0;padding:20px 16px 40px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto}
+    .modal-title{font-size:1rem;font-weight:900;color:var(--s800);margin-bottom:16px}
+    .modal-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .modal-full{grid-column:span 2}
+    .m-label{font-size:0.58rem;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:var(--s400);display:block;margin-bottom:4px}
+    .m-inp{width:100%;background:var(--s50);border:1.5px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--s800);font-size:0.85rem;font-family:inherit;outline:none}
+    .m-inp:focus{border-color:var(--teal)}
+    select.m-inp{-webkit-appearance:none}
+    .modal-btns{display:flex;gap:8px;margin-top:16px}
+    .m-save{flex:1;background:var(--teal-dark);color:white;border:none;border-radius:10px;padding:14px;font-size:0.82rem;font-weight:800;text-transform:uppercase;cursor:pointer}
+    .m-cancel{background:var(--s100);color:var(--s600);border:1.5px solid var(--border);border-radius:10px;padding:14px 18px;font-size:0.82rem;font-weight:800;cursor:pointer}
+
+    /* SETTINGS */
+    .set-card{background:white;border-radius:14px;border:1.5px solid var(--border);margin-bottom:12px;overflow:hidden}
+    .set-head{padding:12px 14px;border-bottom:1px solid var(--border);font-size:0.68rem;font-weight:900;text-transform:uppercase;letter-spacing:0.08em;color:var(--s400)}
+    .set-body{padding:14px;display:flex;flex-direction:column;gap:12px}
+    .save-btn{width:100%;background:var(--teal-dark);color:white;border:none;border-radius:10px;padding:13px;font-size:0.78rem;font-weight:800;text-transform:uppercase;cursor:pointer}
+
+    /* BOTTOM NAV */
+    .bnav{position:fixed;bottom:0;left:0;right:0;background:white;border-top:1px solid var(--border);display:flex;max-width:500px;margin:0 auto;z-index:300}
+    .bnav-btn{flex:1;padding:10px 4px 14px;border:none;background:transparent;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer}
+    .bnav-ico{font-size:1.15rem}
+    .bnav-lbl{font-size:0.52rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--s400)}
+    .bnav-btn.on .bnav-lbl{color:var(--teal-dark)}
+
+    .toast{position:fixed;top:70px;left:50%;transform:translateX(-50%);background:var(--teal-dark);color:white;border-radius:10px;padding:9px 18px;font-size:0.72rem;font-weight:700;z-index:600;white-space:nowrap;opacity:0;transition:opacity 0.3s;pointer-events:none}
+    .toast.show{opacity:1}
+  </style>
+</head>
+<body>
+<div class="app" id="appRoot"></div>
+<div class="overlay hidden" id="modalOverlay"><div class="modal" id="modalBody"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+var KEY = 'ths_hub_v1';
+var SET_KEY = 'ths_settings_v1';
+var STAGES = [
+  {id:'new_lead',      label:'New Lead',            pill:'pill-new'},
+  {id:'appt_set',      label:'Appointment Set',     pill:'pill-appt'},
+  {id:'appt_no',       label:'Appt Not Set',        pill:'pill-appt'},
+  {id:'waiting_quote', label:'Waiting for Quote',   pill:'pill-quoted'},
+  {id:'quoted',        label:'Quoted',              pill:'pill-quoted'},
+  {id:'sign_contract', label:'Sign Contract',       pill:'pill-signed'},
+  {id:'fm_needed',     label:'FM Needs Scheduling', pill:'pill-fm'},
+  {id:'fm_scheduled',  label:'FM Scheduled',        pill:'pill-fm'},
+  {id:'install_date',  label:'Install Date',        pill:'pill-install'},
+  {id:'completed',     label:'Completed',           pill:'pill-done'}
+];
+var SOURCES = ['Phone Call','Website Form','Referral','Other'];
+var AV_COLORS = ['#0a7c6e','#c8960c','#1d4ed8','#7c3aed','#b45309','#065f46'];
+
+var activeView = 'customers';
+var expandedId = null;
+var searchQ    = '';
+var filterStage = 'all';
+
+function safeGet(k,fb){try{var v=localStorage.getItem(k);return v?JSON.parse(v):fb;}catch(e){return fb;}}
+function safeSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+function getCustomers(){return safeGet(KEY,[]);}
+function saveCustomers(list){safeSet(KEY,list);}
+function getSettings(){return safeGet(SET_KEY,{driveFolder:'',abcEmail:'',reviewLink:''});}
+function todayISO(){var d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function fmtDate(iso){if(!iso)return'';try{return new Date(iso+'T00:00:00').toLocaleDateString([],{month:'short',day:'numeric'});}catch(e){return iso;}}
+function getStage(id){return STAGES.find(function(s){return s.id===id;})||STAGES[0];}
+function initials(n){return n.split(/\s+/).map(function(w){return w[0]||'';}).join('').slice(0,2).toUpperCase();}
+function avColor(n){var x=0;for(var i=0;i<n.length;i++)x+=n.charCodeAt(i);return AV_COLORS[x%AV_COLORS.length];}
+function showToast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},2200);}
+
+function el(tag,props,children){
+  var e=document.createElement(tag);
+  for(var k in props){
+    if(k==='C')e.className=props[k];
+    else if(k==='t')e.textContent=props[k];
+    else if(k==='html')e.innerHTML=props[k];
+    else if(k==='click')e.addEventListener('click',props[k]);
+    else if(k==='style')e.style.cssText=props[k];
+    else e[k]=props[k];
+  }
+  if(children)children.forEach(function(c){if(c)e.appendChild(c);});
+  return e;
+}
+
+// ─── RENDER ROOT ─────────────────────────────────────────────────────────────
+function render(){
+  var root=document.getElementById('appRoot');
+  root.innerHTML='';
+  root.appendChild(renderHeader());
+  var main=el('div',{C:'main'});
+  if(activeView==='customers')renderCustomers(main);
+  else if(activeView==='today')renderToday(main);
+  else if(activeView==='settings')renderSettings(main);
+  root.appendChild(main);
+  root.appendChild(renderBottomNav());
+}
+
+function renderHeader(){
+  var h=el('div',{C:'hdr'});
+  var top=el('div',{C:'hdr-top'});
+  var logoWrap=el('div',{style:'display:flex;flex-direction:column;gap:2px'});
+  var logo=el('img',{C:'hdr-logo',src:'https://www.totalhomeservicesofgeorgia.com/images/brand/othersecondary.png',alt:'Total Home Services of Georgia'});
+  logo.onerror=function(){this.style.display='none';};
+  logoWrap.appendChild(logo);
+  logoWrap.appendChild(el('div',{C:'hdr-name',t:'Field Hub — Cameron'}));
+  top.appendChild(logoWrap);
+  var addB=el('button',{C:'add-btn',t:'+ Customer',click:function(){openAddModal();}});
+  top.appendChild(addB);
+  h.appendChild(top);
+  // Stage filter tabs
+  var tabs=el('div',{C:'vtabs'});
+  var allBtn=el('button',{C:'vtab'+(filterStage==='all'?' on':''),t:'All',click:function(){filterStage='all';render();}});
+  tabs.appendChild(allBtn);
+  // Only show stages with customers
+  var custs=getCustomers();
+  STAGES.forEach(function(s){
+    var cnt=custs.filter(function(c){return c.stage===s.id;}).length;
+    if(cnt===0&&filterStage!==s.id)return;
+    var short=s.label.replace('Appointment','Appt').replace('Scheduling','Sched').replace('Contract','Ctrct').replace('Scheduled','Sched').replace('Waiting for ','').replace('Completed','Done');
+    var btn=el('button',{C:'vtab'+(filterStage===s.id?' on':''),t:short,click:(function(sid){return function(){filterStage=sid;render();};})(s.id)});
+    tabs.appendChild(btn);
+  });
+  h.appendChild(tabs);
+  return h;
+}
+
+function renderCustomers(main){
+  var custs=getCustomers();
+  // Stats
+  var active=custs.filter(function(c){return c.stage!=='completed';}).length;
+  var todayCnt=custs.filter(function(c){return c.apptDate===todayISO()||c.installDate===todayISO();}).length;
+  var fmNeeded=custs.filter(function(c){return c.stage==='fm_needed';}).length;
+  var stats=el('div',{C:'stats-row'});
+  [[active,'Active'],[todayCnt,'Today'],[fmNeeded,'Needs FM']].forEach(function(p){
+    var sc=el('div',{C:'stat'});
+    sc.appendChild(el('div',{C:'stat-n',t:String(p[0])}));
+    sc.appendChild(el('div',{C:'stat-l',t:p[1]}));
+    stats.appendChild(sc);
+  });
+  main.appendChild(stats);
+  // Search
+  var sw=el('div',{C:'search-wrap'});
+  sw.appendChild(el('span',{C:'search-ico',t:'🔍'}));
+  var si=el('input',{C:'search-inp',placeholder:'Search name, address, notes...'});
+  si.value=searchQ;
+  si.addEventListener('input',function(){searchQ=this.value;render();});
+  sw.appendChild(si);main.appendChild(sw);
+  // Filter
+  var filtered=custs.filter(function(c){
+    if(filterStage!=='all'&&c.stage!==filterStage)return false;
+    if(!searchQ)return true;
+    var q=searchQ.toLowerCase();
+    return (c.name||'').toLowerCase().includes(q)||(c.address||'').toLowerCase().includes(q)||(c.notes||'').toLowerCase().includes(q);
+  });
+  if(!filtered.length){
+    main.appendChild(el('div',{C:'empty',html:'<span class="empty-ico">🏠</span>No customers yet.<br>Tap <strong>+ Customer</strong> to add one.'}));
+    return;
+  }
+  // Group by stage
+  var byStage={};
+  STAGES.forEach(function(s){byStage[s.id]=[];});
+  filtered.forEach(function(c){if(byStage[c.stage])byStage[c.stage].push(c);});
+  STAGES.forEach(function(s){
+    var list=byStage[s.id];
+    if(!list||!list.length)return;
+    var grpHdr=el('div',{style:'font-size:0.6rem;font-weight:900;text-transform:uppercase;letter-spacing:0.1em;color:var(--s400);margin:14px 0 8px;display:flex;align-items:center;gap:8px'});
+    grpHdr.appendChild(el('span',{t:s.label}));
+    grpHdr.appendChild(el('span',{style:'background:var(--s100);border-radius:10px;padding:1px 7px;color:var(--s500)',t:String(list.length)}));
+    main.appendChild(grpHdr);
+    list.forEach(function(c){main.appendChild(renderCard(c));});
+  });
+}
+
+function renderCard(c){
+  var isExp=expandedId===c.id;
+  var stage=getStage(c.stage);
+  var card=el('div',{C:'cc'});
+  var head=el('div',{C:'cc-head'});
+  // Accent bar
+  var hasWin=/window/i.test(c.scope||'');
+  var hasDoor=/door/i.test(c.scope||'');
+  var accentClass=hasWin&&hasDoor?'both':hasDoor?'door':'win';
+  head.appendChild(el('div',{C:'cc-accent '+accentClass}));
+  var body=el('div',{C:'cc-body'});
+  var top=el('div',{C:'cc-top'});
+  var nameEl=el('div',{C:'cc-name',t:c.name||'Unknown'});
+  var stagePill=el('span',{C:'stage-pill '+stage.pill,t:stage.label});
+  top.appendChild(nameEl);top.appendChild(stagePill);
+  body.appendChild(top);
+  var metaParts=[];
+  if(c.phone)metaParts.push(c.phone);
+  if(c.address)metaParts.push(c.address.split(',')[0]);
+  if(c.apptDate)metaParts.push('📅 '+fmtDate(c.apptDate));
+  body.appendChild(el('div',{C:'cc-meta',t:metaParts.join('  •  ')}));
+  head.addEventListener('click',function(){expandedId=isExp?null:c.id;render();});
+  head.appendChild(body);
+  card.appendChild(head);
+  // Actions
+  var acts=el('div',{C:'cc-acts'});
+  var fmBtn=el('button',{C:'ca p',t:'FM Sheet',click:function(){
+    safeSet('ths_active_customer',JSON.stringify(c));
+    window.location.href='ths-measure.html';
+  }});
+  acts.appendChild(fmBtn);
+  if(c.phone){
+    acts.appendChild(el('button',{C:'ca',t:'Call',click:function(){window.open('tel:'+c.phone);}}));
+    acts.appendChild(el('button',{C:'ca',t:'Text',click:function(){openQuickText(c);}}));
+  }
+  acts.appendChild(el('button',{C:'ca gold',t:'Edit',click:function(){openAddModal(c);}}));
+  card.appendChild(acts);
+  // Expanded details
+  if(isExp){
+    var det=el('div',{C:'cc-det'});
+    var r1=el('div',{C:'det-row'});
+    if(c.email){var ef=el('div',{C:'det-field'});ef.appendChild(el('span',{C:'det-label',t:'Email'}));var ea=el('a',{href:'mailto:'+c.email});ea.className='det-val';ea.textContent=c.email;ef.appendChild(ea);r1.appendChild(ef);}
+    if(c.address){var af=el('div',{C:'det-field'});af.appendChild(el('span',{C:'det-label',t:'Address'}));var aa=el('a',{href:'https://maps.google.com/?q='+encodeURIComponent(c.address),target:'_blank'});aa.className='det-val';aa.textContent=c.address;af.appendChild(aa);r1.appendChild(af);}
+    if(r1.children.length)det.appendChild(r1);
+    var r2=el('div',{C:'det-row'});
+    if(c.apptDate){var adf=el('div',{C:'det-field'});adf.appendChild(el('span',{C:'det-label',t:'Appointment'}));adf.appendChild(el('div',{C:'det-val',t:fmtDate(c.apptDate)+(c.apptTime?' @ '+c.apptTime:'')}));r2.appendChild(adf);}
+    if(c.installDate){var idf=el('div',{C:'det-field'});idf.appendChild(el('span',{C:'det-label',t:'Install Date'}));idf.appendChild(el('div',{C:'det-val',t:fmtDate(c.installDate)+(c.installTime?' @ '+c.installTime:'')}));r2.appendChild(idf);}
+    if(r2.children.length)det.appendChild(r2);
+    if(c.scope){var sf=el('div',{C:'det-field',style:'width:100%'});sf.appendChild(el('span',{C:'det-label',t:'Scope'}));sf.appendChild(el('div',{C:'det-val',t:c.scope}));det.appendChild(sf);}
+    if(c.notes){var nf=el('div',{C:'det-field',style:'width:100%'});nf.appendChild(el('span',{C:'det-label',t:'Notes / Flags'}));nf.appendChild(el('div',{C:'det-val',t:c.notes}));det.appendChild(nf);}
+    // Stage selector
+    det.appendChild(el('span',{C:'det-label',t:'Move Stage'}));
+    var sel=el('select',{C:'stage-sel'});
+    STAGES.forEach(function(s){var o=document.createElement('option');o.value=s.id;o.textContent=s.label;if(s.id===c.stage)o.selected=true;sel.appendChild(o);});
+    sel.addEventListener('change',function(){
+      var custs=getCustomers();
+      var idx=custs.findIndex(function(x){return x.id===c.id;});
+      if(idx>-1){custs[idx].stage=this.value;custs[idx].updatedAt=todayISO();saveCustomers(custs);}
+      showToast('Stage updated');render();
+    });
+    det.appendChild(sel);
+    // Delete
+    var delBtn=el('button',{style:'background:#fef2f2;color:#dc2626;border:1px solid #fecaca;border-radius:8px;padding:9px;font-size:0.65rem;font-weight:800;text-transform:uppercase;cursor:pointer;width:100%',t:'Delete Customer',click:function(){if(confirm('Delete '+c.name+'? Cannot be undone.')){var custs=getCustomers().filter(function(x){return x.id!==c.id;});saveCustomers(custs);expandedId=null;render();}}});
+    det.appendChild(delBtn);
+    card.appendChild(det);
+  }
+  return card;
+}
+
+// ─── TODAY VIEW ───────────────────────────────────────────────────────────────
+function renderToday(main){
+  var today=todayISO();
+  var
